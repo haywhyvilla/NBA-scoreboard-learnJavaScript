@@ -85,26 +85,42 @@ const warriorsGames = [
   },
 ];
 
-const ulParent = document.createElement("ul");
-for (let game of warriorsGames) {
-  const { homeTeam, awayTeam } = game;
-  const gameLi = document.createElement("li");
-  const { team: hTeam, points: hPoints } = homeTeam;
-  const { team: aTeam, points: aPoints } = awayTeam;
+const makeChart = (games) => {
+  const ulParent = document.createElement("ul");
+  for (let game of games) {
+    const { homeTeam, awayTeam } = game;
+    const gameLi = document.createElement("li");
+    const { team: hTeam, points: hPoints } = homeTeam;
+    const { team: aTeam, points: aPoints } = awayTeam;
 
-  const teamName = `${aTeam} @ ${hTeam}`;
-  let teamScore;
-  if (aPoints > hPoints) {
-    teamScore = `<b>${aPoints}</b>- ${hPoints}`;
-  } else {
-    teamScore = `${aPoints}- <b>${hPoints}</b>`;
+    const teamName = `${aTeam} @ ${hTeam}`;
+    let teamScore;
+    if (aPoints > hPoints) {
+      teamScore = `<b>${aPoints}</b>- ${hPoints}`;
+    } else {
+      teamScore = `${aPoints}- <b>${hPoints}</b>`;
+    }
+
+    const warriors = hTeam === "Golden State" ? homeTeam : awayTeam;
+    gameLi.classList.add(warriors.isWinner ? "win" : "loss");
+
+    gameLi.innerHTML = `${teamName} ${teamScore}`;
+    ulParent.append(gameLi);
   }
+  return ulParent;
+};
 
-  const warriors = hTeam === "Golden State" ? homeTeam : awayTeam;
-  gameLi.classList.add(warriors.isWinner ? "win" : "loss");
+const chart1 = makeChart(warriorsGames);
+document.body.append(chart1);
 
-  gameLi.innerHTML = `${teamName} ${teamScore}`;
-  ulParent.append(gameLi);
-}
+const chart2 = makeChart(warriorsGames);
+document.body.append(chart2);
 
-document.body.append(ulParent);
+axios
+  .get("https://v2.nba.api-sports.io/status/")
+  .then((res) => {
+    console.log(res.data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
